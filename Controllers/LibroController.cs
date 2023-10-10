@@ -85,17 +85,17 @@ namespace Parcial.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nombre,Año,Genero,Multilenguaje,Precio,Domicilio,Imagen,ClienteId")] Libro libro)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)// Aca se lo negue porque sino el modelo no me pasa y no me lo crea
             {
                 _context.Add(libro);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(libro);
+            return View(libro); //Capaz debo retornar un VM?
         }
 
         // GET: Libro/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)//No tengo ID para pasarle
         {
             if (id == null || _context.Libro == null)
             {
@@ -122,7 +122,7 @@ namespace Parcial.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)//
             {
                 try
                 {
