@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Parcial.Models;
 
-    public class LibreriaContext : DbContext
+    public class LibreriaContext : IdentityDbContext
     {
         public LibreriaContext (DbContextOptions<LibreriaContext> options)
             : base(options)

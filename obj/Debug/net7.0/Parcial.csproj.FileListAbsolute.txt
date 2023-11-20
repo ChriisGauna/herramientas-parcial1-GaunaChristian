@@ -256,3 +256,6 @@ C:\Users\User\Desktop\ISTEA\MVC\Parcial\obj\Debug\net7.0\refint\Parcial.dll
 C:\Users\User\Desktop\ISTEA\MVC\Parcial\obj\Debug\net7.0\Parcial.pdb
 C:\Users\User\Desktop\ISTEA\MVC\Parcial\obj\Debug\net7.0\Parcial.genruntimeconfig.cache
 C:\Users\User\Desktop\ISTEA\MVC\Parcial\obj\Debug\net7.0\ref\Parcial.dll
+C:\Users\User\Desktop\ISTEA\MVC\Parcial\bin\Debug\net7.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Users\User\Desktop\ISTEA\MVC\Parcial\bin\Debug\net7.0\Microsoft.AspNetCore.Identity.UI.dll
+C:\Users\User\Desktop\ISTEA\MVC\Parcial\obj\Debug\net7.0\Parcial.MvcApplicationPartsAssemblyInfo.cs

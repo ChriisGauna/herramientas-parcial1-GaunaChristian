@@ -1,9 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Parcial.Services;
+using Microsoft.AspNetCore.Identity;
+
+
+//using Data.LibreriaContext;
 var builder = WebApplication.CreateBuilder(args);
+
+
 builder.Services.AddDbContext<LibreriaContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("LibreriaContext") ?? throw new InvalidOperationException("Connection string 'LibreriaContext' not found.")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("LibreriaContext") ?? throw new 
+    InvalidOperationException("Connection string 'LibreriaContext' not found.")));
+
+builder.Services.AddDefaultIdentity<IdentityUser>
+(options => options.SignIn.RequireConfirmedAccount = true)
+.AddEntityFrameworkStores<LibreriaContext>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -24,9 +36,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthorization();
-
+app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

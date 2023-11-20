@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using Parcial.ViewModels;
 
 namespace Parcial.Controllers
 {
+    [Authorize]
     public class LibroController : Controller
     {
         private readonly ILibroService _Libroservicio;
