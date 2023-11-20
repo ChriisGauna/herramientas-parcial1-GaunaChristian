@@ -1,7 +1,8 @@
-@model Parcial.Models.Libro
+@model Parcial.ViewModels.LibroCreateVM // USAMOS EL VIEWMODELS
 
 @{
     ViewData["Title"] = "Create";
+    var clienteList = (SelectList) ViewData["Clientes"];
 }
 
 <h1>Create</h1>
@@ -47,10 +48,12 @@
                 <input asp-for="Imagen" class="form-control" />
                 <span asp-validation-for="Imagen" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ClienteId" class="control-label"></label>
-                <input asp-for="ClienteId" class="form-control" />
-                <span asp-validation-for="ClienteId" class="text-danger"></span>
+             <div class="form-group mt-2 mb-2">
+                <select multiple 
+                    class="form-control"
+                    asp-for="UsuarioIds" 
+                    asp-items="clienteList"> 
+                </select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

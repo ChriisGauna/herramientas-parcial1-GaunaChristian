@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,27 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Parcial.Migrations
 {
     [DbContext(typeof(LibreriaContext))]
-    partial class LibreriaContextModelSnapshot : ModelSnapshot
+    [Migration("20231118135259_add_store_model")]
+    partial class add_store_model
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.11");
-
-            modelBuilder.Entity("BibliotecaClientes", b =>
-                {
-                    b.Property<int>("LibrosId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UsuariosId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("LibrosId", "UsuariosId");
-
-                    b.HasIndex("UsuariosId");
-
-                    b.ToTable("BibliotecaClientes");
-                });
 
             modelBuilder.Entity("Parcial.Models.Cliente", b =>
                 {
@@ -62,6 +50,9 @@ namespace Parcial.Migrations
                     b.Property<int>("Año")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ClienteId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Domicilio")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -84,40 +75,11 @@ namespace Parcial.Migrations
                     b.Property<decimal>("Precio")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Stock")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
 
                     b.ToTable("Libro");
-                });
-
-            modelBuilder.Entity("Parcial.Models.Operacion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Cantidad")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Factura")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("LibroId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TipoMov")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LibroId");
-
-                    b.ToTable("Operacion");
                 });
 
             modelBuilder.Entity("Parcial.Models.Store", b =>
@@ -147,30 +109,13 @@ namespace Parcial.Migrations
                     b.ToTable("Store");
                 });
 
-            modelBuilder.Entity("BibliotecaClientes", b =>
+            modelBuilder.Entity("Parcial.Models.Libro", b =>
                 {
-                    b.HasOne("Parcial.Models.Libro", null)
-                        .WithMany()
-                        .HasForeignKey("LibrosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Parcial.Models.Cliente", "Usuario")
+                        .WithMany("Libros")
+                        .HasForeignKey("ClienteId");
 
-                    b.HasOne("Parcial.Models.Cliente", null)
-                        .WithMany()
-                        .HasForeignKey("UsuariosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Parcial.Models.Operacion", b =>
-                {
-                    b.HasOne("Parcial.Models.Libro", "Libro")
-                        .WithMany()
-                        .HasForeignKey("LibroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Libro");
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("Parcial.Models.Store", b =>
@@ -182,6 +127,11 @@ namespace Parcial.Migrations
                         .IsRequired();
 
                     b.Navigation("ProviderStore");
+                });
+
+            modelBuilder.Entity("Parcial.Models.Cliente", b =>
+                {
+                    b.Navigation("Libros");
                 });
 #pragma warning restore 612, 618
         }

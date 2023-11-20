@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Libreria ISTEA</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -12,7 +12,7 @@
 
 <form method="get" asp-action="Index" asp-controller="Libro"> <!-- Que vuelva a llamar a la accion Index del Controller Libro -->
    <div class="col-6 form-group mb-2">
-    <input class="form-control"  -asp-for="Filter"> <!-- Filtro que vamos a meter en ViewModels -->
+    <input class="form-control" asp-for="Filter"> <!-- Filtro que vamos a meter en ViewModels -->
     </div>
     <button class="btn btn-primary" type="submit">Buscar</button>
 </form>
@@ -36,7 +36,7 @@
                 @Html.DisplayNameFor(model => model.Libros[0].Imagen)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Libros[0].ClienteNombre)
+                @Html.DisplayNameFor(model => model.Libros[0].Stock)
             </th>
             <th></th>
         </tr>
@@ -60,12 +60,14 @@
                 @Html.DisplayFor(modelItem => item.Imagen)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ClienteNombre)
+                @Html.DisplayFor(modelItem => item.Stock)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                <a asp-action="Compra" asp-route-id="@item.Id">Compra</a> |
+                <a asp-action="Venta" asp-route-id="@item.Id">Venta</a>
             </td>
         </tr>
 }

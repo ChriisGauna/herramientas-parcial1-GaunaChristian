@@ -1,40 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Parcial.Models;
+using Parcial.Services;
 using Parcial.ViewModels;
 
 namespace Parcial.Controllers
 {
     public class LibroController : Controller
     {
-        private readonly LibreriaContext _context;
+        private readonly ILibroService _Libroservicio;
 
-        public LibroController(LibreriaContext context)
+        public LibroController(ILibroService libroService) //El constructor inyecta el servicio tambien ahora
         {
-            _context = context;
+            _Libroservicio = libroService;
         }
 
         // GET: Libro  // Aca va a entrar el Filtro del Index Libro
         public async Task<IActionResult> Index(string Filter)
         {
-            var query = from libro in _context.Libro select libro;
-            //Aca me traigo todos los libros 
-            query = query.Include(x=> x.Usuario);
-            // el include nos trae los elementos de las relaciones
-            if(!string.IsNullOrEmpty(Filter))
-            {
-                query = query.Where(x => x.Nombre.ToLower().Contains(Filter.ToLower()) || 
-                                x.Domicilio.ToLower().Contains(Filter.ToLower()));
-            }
-
-            var libroList = await query.ToListAsync();//Me guardo los datos del toList en la var
+          
             var libroListVM = new LibroListVM();//Instancio una var de tipo ListVM que le voy a pasar a la vista
-
+            var libroList = await _Libroservicio.GetAll(Filter);
             // Mapeamos la entidad con el view model para enviar a la vista
             foreach (var item in libroList)
             {
@@ -45,25 +32,20 @@ namespace Parcial.Controllers
                     Genero = item.Genero,
                     Año = item.Año,
                     Imagen = item.Imagen,
-                    ClienteNombre = item.Usuario?.Nombre
+                    Stock = item.Stock
+               //     ClienteNombre = item.Usuario?.Nombre
                 });
             }
 
             return View(libroListVM);
-              //return View(await query.ToListAsync()); //ToListAsync me convierte la query en una lista y lo retorna a la vista
                          
         }
+
 
         // GET: Libro/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Libro == null)
-            {
-                return NotFound();
-            }
-
-            var libro = await _context.Libro
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var libro = await _Libroservicio.GetById(id);
             if (libro == null)
             {
                 return NotFound();
@@ -73,8 +55,11 @@ namespace Parcial.Controllers
         }
 
         // GET: Libro/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var clienteList = await _Libroservicio.GetAllClientes(); //Traigo los clientes por el servicio
+            if (clienteList == null) clienteList = new List<Cliente>();//para que no rompa si viene null
+            ViewData["Clientes"] = new SelectList(clienteList, "Id", "Nombre"); //Guardo el id y Nombre para pintarlo en la vista
             return View();
         }
 
@@ -83,12 +68,24 @@ namespace Parcial.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Año,Genero,Multilenguaje,Precio,Domicilio,Imagen,ClienteId")] Libro libro)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Año,Genero,Multilenguaje,Precio,Domicilio,Imagen,UsuarioIds")] LibroCreateVM libro)
         {
-            if (!ModelState.IsValid)// Aca se lo negue porque sino el modelo no me pasa y no me lo crea
+            if (!ModelState.IsValid)
             {
-                _context.Add(libro);
-                await _context.SaveChangesAsync();
+                var clienteList = await _Libroservicio.GetAllClientes();
+                var clientefilterList = clienteList.Where(x=> libro.UsuarioIds.Contains(x.Id)).ToList();
+                var newLibro = new Libro{
+                    Nombre = libro.Nombre,
+                    Año = libro.Año,
+                    Genero = libro.Genero,
+                    Multilenguaje = libro.Multilenguaje,
+                    Precio = libro.Precio,
+                    Domicilio = libro.Domicilio,
+                    Imagen = libro.Imagen,
+                    Usuarios = clientefilterList,
+
+                };
+                await _Libroservicio.Create(newLibro);
                 return RedirectToAction(nameof(Index));
             }
             return View(libro); //Capaz debo retornar un VM?
@@ -97,12 +94,9 @@ namespace Parcial.Controllers
         // GET: Libro/Edit/5
         public async Task<IActionResult> Edit(int? id)//No tengo ID para pasarle
         {
-            if (id == null || _context.Libro == null)
-            {
-                return NotFound();
-            }
+          
 
-            var libro = await _context.Libro.FindAsync(id);
+            var libro = await _Libroservicio.GetById(id);
             if (libro == null)
             {
                 return NotFound();
@@ -126,12 +120,11 @@ namespace Parcial.Controllers
             {
                 try
                 {
-                    _context.Update(libro);
-                    await _context.SaveChangesAsync();
+                    await _Libroservicio.Update(libro);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LibroExists(libro.Id))
+                    if (_Libroservicio.GetById(id) == null)
                     {
                         return NotFound();
                     }
@@ -148,13 +141,7 @@ namespace Parcial.Controllers
         // GET: Libro/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Libro == null)
-            {
-                return NotFound();
-            }
-
-            var libro = await _context.Libro
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var libro = await _Libroservicio.GetById(id);
             if (libro == null)
             {
                 return NotFound();
@@ -168,23 +155,85 @@ namespace Parcial.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Libro == null)
-            {
-                return Problem("Entity set 'LibreriaContext.Libro'  is null.");
-            }
-            var libro = await _context.Libro.FindAsync(id);
-            if (libro != null)
-            {
-                _context.Libro.Remove(libro);
-            }
-            
-            await _context.SaveChangesAsync();
+           await _Libroservicio.Delete(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool LibroExists(int id)
+
+
+
+         // GET: Libro/Compra
+        public async Task<IActionResult> Compra (int id)
         {
-          return (_context.Libro?.Any(e => e.Id == id)).GetValueOrDefault();
+            var libro = await _Libroservicio.GetById(id);//me traigo los libros
+            if (libro == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Libro"] = libro;
+
+            return View();
         }
+
+        // POST: Libro/Compra
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Compra ([Bind("LibroId,Fecha,Cantidad,Factura")] OperacionCreateVM compra)
+        {
+            if (ModelState.IsValid)
+            {
+                var nuevaCompra = new Operacion {
+                    LibroId = compra.LibroId,
+                    Cantidad = compra.Cantidad,
+                    Factura = compra.Factura,
+                    Fecha = compra.Fecha,
+                    TipoMov = Utils.TipoMovimiento.compra
+                };
+                await _Libroservicio.Compra(nuevaCompra);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(compra);
+        }
+
+        // GET: Libro/Venta
+        public async Task<IActionResult> Venta(int id)
+        {
+            var libro = await _Libroservicio.GetById(id);
+            if (libro == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Libro"] = libro;
+
+            return View();
+        }
+
+        // POST:  Libro/Venta
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Venta([Bind("LibroId,Fecha,Cantidad,Factura")] OperacionCreateVM venta)
+        {
+            if (ModelState.IsValid)
+            {
+                var newVenta = new Operacion {
+                    LibroId = venta.LibroId,
+                    Cantidad = venta.Cantidad,
+                    Factura = venta.Factura,
+                    Fecha = venta.Fecha,
+                    TipoMov = Utils.TipoMovimiento.venta
+                };
+                var response = await _Libroservicio.Venta(newVenta);
+
+                if (string.IsNullOrEmpty(response))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                ViewData["ErrorMsg"] = response;
+            }
+            return View(venta);
+        }
+
     }
 }

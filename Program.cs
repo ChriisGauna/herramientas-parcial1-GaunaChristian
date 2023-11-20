@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Parcial.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<LibreriaContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("LibreriaContext") ?? throw new InvalidOperationException("Connection string 'LibreriaContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<ILibroService, LibroService>();// Inyectamos el servicio
 
 var app = builder.Build();
 
