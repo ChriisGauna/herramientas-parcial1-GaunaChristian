@@ -32,7 +32,7 @@ public class LibroService : ILibroService
     public async Task<List<Libro>> GetAll(string Filter)
     {
         var query = from libro in _context.Libro select libro;
-            //Aca me traigo todos los libros con linQ
+            //Me traigo todos los libros del context 
           //  query = query.Include(x=> x.Usuario);
             // el include nos trae los elementos de las relaciones
             if(!string.IsNullOrEmpty(Filter))

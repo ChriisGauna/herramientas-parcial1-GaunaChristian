@@ -15,6 +15,6 @@ public class Libro
     
     //public int? ClienteId { get; set; } //Foreing Key
 
-    public virtual ICollection<Cliente> Usuarios { get; set; } //Ahora esto va a ser una lista de usuarios
+    public virtual ICollection<Cliente> Usuarios { get; set; } //Ahora esto va a ser una lista de usuarios para la relacion muchos a muchos
     //virtual te permite que una propiedad y método pueda ser sobreescrita por una clase que herede de ella.
 }

@@ -16,12 +16,12 @@ using Parcial.Models;
         public DbSet<Parcial.Models.Store> Store { get; set; } = default!;
         public DbSet<Parcial.Models.Operacion> Operacion { get; set; } = default!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder) // Aca seteamos la rel many to many
         {
             modelBuilder.Entity<Libro>()
             .HasMany(e => e.Usuarios)
             .WithMany(e => e.Libros)
-            .UsingEntity("BibliotecaClientes");
+            .UsingEntity("BibliotecaClientes"); // Tabla intermedia
             base.OnModelCreating(modelBuilder);
         }
     }

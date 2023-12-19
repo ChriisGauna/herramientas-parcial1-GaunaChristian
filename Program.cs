@@ -14,13 +14,14 @@ builder.Services.AddDbContext<LibreriaContext>(options =>
 
 builder.Services.AddDefaultIdentity<IdentityUser>
 (options => options.SignIn.RequireConfirmedAccount = true)
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<LibreriaContext>();
 
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<ILibroService, LibroService>();// Inyectamos el servicio
+builder.Services.AddScoped<ILibroService, LibroService>();// Inyectamos el servicio aca
 
 var app = builder.Build();
 
@@ -36,10 +37,50 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthorization();
-app.MapRazorPages();
+app.UseAuthorization();// Agregado para que funcione la capa de seguridad del authorize
+app.MapRazorPages();// 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+//Aca creamos el Manager y creamos los roles
+using(var scope= app.Services.CreateScope())
+{
+    var roleManager =
+        scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        var roles= new[] {"Admin", "User", "Manager"};
+
+        foreach (var role in roles)
+            {
+                if(!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole(role));
+
+            }
+
+}
+/*
+using(var scope= app.Services.CreateScope())
+{
+    var userManager =
+        scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+        string email = "admin@admin.com";
+        string password = "Test1234";
+
+        if (await userManager.FindByEmailAsync(email)== null)
+        {
+        var user = new IdentityUser
+        {
+            UserName = email,
+            Email = email
+        };
+
+        await userManager.CreateAsync (user, password);
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
+
+     
+
+}*/
 app.Run();

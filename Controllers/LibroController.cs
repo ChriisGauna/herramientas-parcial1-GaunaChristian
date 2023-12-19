@@ -74,13 +74,13 @@ namespace Parcial.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var clienteList = await _Libroservicio.GetAllClientes();
+                var clienteList = await _Libroservicio.GetAllClientes(); //Me los traigo con el servicio
                 var clientefilterList = clienteList.Where(x=> libro.UsuarioIds.Contains(x.Id)).ToList();
                 var newLibro = new Libro{
                     Nombre = libro.Nombre,
                     Año = libro.Año,
                     Genero = libro.Genero,
-                    Multilenguaje = libro.Multilenguaje,
+                    Multilenguaje = libro.Multilenguaje,// MAPEO TODOS LOS DATOS
                     Precio = libro.Precio,
                     Domicilio = libro.Domicilio,
                     Imagen = libro.Imagen,
@@ -90,11 +90,11 @@ namespace Parcial.Controllers
                 await _Libroservicio.Create(newLibro);
                 return RedirectToAction(nameof(Index));
             }
-            return View(libro); //Capaz debo retornar un VM?
+            return View(libro);
         }
 
         // GET: Libro/Edit/5
-        public async Task<IActionResult> Edit(int? id)//No tengo ID para pasarle
+        public async Task<IActionResult> Edit(int? id)
         {
           
 

@@ -6,5 +6,5 @@ public class Cliente
     public string Nombre { get; set; } 
     public decimal Antiguedad { get; set; } 
     public string Domicilio { get; set; } 
-    public virtual ICollection<Libro> Libros { get; set; } 
+    public virtual ICollection<Libro> Libros { get; set; } // para relacion muchos a muchos
 }
